@@ -1,0 +1,23 @@
+LOAD DATABASE
+     FROM      mysql://root:xxxxxx@127.0.0.1:3307/wms_production
+     INTO postgresql://wms:xxxxxx@localhost:5432/wms_migration_dump
+
+ WITH include drop, create tables, create indexes, preserve index names, reset sequences, batch rows = 25000, batch size = 20MB, batch concurrency = 10
+
+  SET maintenance_work_mem to '512MB',
+      work_mem to '512MB',
+      search_path to 'bromma'
+
+ CAST type datetime to timestamp using zero-dates-to-null,
+      type date drop not null drop default using zero-dates-to-null,
+      type year to integer,
+      type int with extra auto_increment to serial drop typemod keep default keep not null,
+      type int to integer drop typemod,
+      type varchar to varchar keep typemod,
+      type bigint to bigint drop typemod
+
+ BEFORE LOAD DO
+ $$ create schema if not exists bromma; $$
+
+ AFTER LOAD DO
+ $$ UPDATE pg_constraint SET confupdtype = 'a', confdeltype = 'a' WHERE contype = 'f'; $$;

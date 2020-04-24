@@ -1,0 +1,97 @@
+AllCops:
+  RunRailsCops: true
+  Include:
+    - '**/Gemfile'
+    - '**/Rakefile'
+  Exclude:
+   - 'bin/**/*'
+   - 'db/**/*'
+   - 'vendor/**/*'
+   - 'spec/factories/**/*.rb'
+
+# === DISABLE ===
+#
+# (Might try using it later)
+#
+Metrics/LineLength:
+  Enabled: false
+
+# === DISABLE ===
+#
+# - https://github.com/bbatsov/rubocop/blob/4240ae468edbd1e1589ed3501cc16cbba3ab8513/config/enabled.yml#L431-L436
+#
+# Why? Because dont change our barcode eg 7046260185968 to 7_046_260_185_968
+#
+Style/NumericLiterals:
+  Enabled: false
+
+# === DISABLE ===
+#
+# - https://github.com/bbatsov/ruby-style-guide#if-as-a-modifier
+#
+# Why? Because code coverage can not accurately tell us about coverage of one-liner if:s.
+#
+Style/IfUnlessModifier:
+  Enabled: false
+
+# === DISABLE ===
+#
+# Why? Because of rdoc, eg: '@author stefan'
+#
+Style/AsciiComments:
+  Enabled: false
+
+# === DISABLE ===
+#
+# - https://github.com/bbatsov/rubocop/blob/4240ae468edbd1e1589ed3501cc16cbba3ab8513/config/default.yml#L240
+# - https://github.com/thoughtbot/hound/issues/292
+#
+# Follow thoughtbot/hound style
+#
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# === OVERRIDE ===
+#
+# - https://github.com/bbatsov/ruby-style-guide#no-trailing-array-commas
+#
+# Do not convert trailing comma in multi line.
+# Why? Because adding a new item to multi line should not alter the line
+# above/below it.
+#
+Style/TrailingComma:
+  EnforcedStyleForMultiline: comma
+
+# === OVERRIDE ===
+#
+# Why? Preference of :table - left alignment of keys, hash rockets, and values
+#
+Style/AlignHash:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+Style/SpaceAroundOperators:
+  MultiSpaceAllowedForOperators:
+    - '||='
+    - '='
+    - '=>'
+
+# === OVERRIDE ===
+#
+# - https://github.com/bbatsov/rubocop/blob/4240ae468edbd1e1589ed3501cc16cbba3ab8513/config/default.yml#L163-L167
+#
+# Why? Allow 'expect { ... }.to' multi-line syntax in specs instead of unreadable 'expect do ... end.to' syntax
+#
+Style/BlockDelimiters:
+  EnforcedStyle: semantic
+  FunctionalMethods:
+    - sequence
+    - silence_stream
+    - let
+    - let!
+    - given
+    - given!
+    - subject
+    - watch
+    - before
+    - after
+    - filter_sensitive_data

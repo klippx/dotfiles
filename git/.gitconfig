@@ -1,0 +1,90 @@
+[push]
+  default = upstream
+[user]
+  name = Mathias Klippinge
+  email = mathias.klippinge@gmail.com
+[alias]
+  wut = log --pretty=format:'%Cred%h%Creset (%Cgreen%cr%Creset) %C(blue)%an%Creset %s' \
+            --abbrev-commit \
+            --date=relative \
+            --grep='Merge pull request' \
+            --invert-grep \
+            master..
+  gr = log --show-signature --graph --full-history --all --color --decorate
+  unstage = reset HEAD --
+  cleanup = !git branch --list --merged | grep -v master | xargs git branch -d
+  publish = !git push -u origin $(git branch-name)
+  branch-name = !git rev-parse --abbrev-ref HEAD
+  pushf = push --force-with-lease
+[merge]
+  tool = vimdiff
+  stat = true
+[core]
+  excludesfile = ${HOME}/.gitignore_global
+  precomposeunicode = true
+  editor = vim
+  whitespace = trailing-space,space-before-tab
+  pager = diff-so-fancy | less --tabs=4 -RFX
+  hooksPath = /Users/mathias.klippinge/.githooks
+[pager]
+  diff=true
+[branch]
+  autosetuprebase = always
+[filter "media"]
+  clean = git-media-clean %f
+  smudge = git-media-smudge %f
+[diff]
+  noprefix = true
+  algorithm = histogram
+[rerere]
+  enabled = true
+[fetch]
+  prune = true
+[interactive]
+  # Temporary replaced "diff-so-fancy" with bundled "diff-highlight".
+  #
+  # The reason are incompatibility problems of "diff-so-fancy" with the latest Git versions caused by changes in the
+  # diff logic.
+  # See "so-fancy/diff-so-fancy#35" and "so-fancy/diff-so-fancy#296" for details.
+  #
+  # Note that downgrading to a compatible Git version is not an option because versions <2.17.1 are effected by
+  # CVE-2018-11233 and and 11235.
+  # See https://github.com/git/git/blob/master/Documentation/RelNotes/2.17.1.txt#L7-L10 for details.
+  #
+  # To fix this problem for interactive patch mode the filter has been temporary changed to the official
+  # "diff-highlight" tool bundled with Git.
+  # See https://github.com/git/git/tree/master/contrib/diff-highlight for details.
+  #diffFilter = diff-so-fancy
+
+## Color
+#
+
+[color]
+  ui = true
+[color "diff"]
+  meta = yellow bold
+  commit = green bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+  whitespace = red reverse
+[color "diff-highlight"]
+  oldNormal = red bold
+  oldHighlight = red bold 52
+  newNormal = green bold
+  newHighlight = green bold 22
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+  smudge = git-lfs smudge --skip -- %f
+  process = git-lfs filter-process --skip
+  required = true
+[lfs]
+	locksverify = false
