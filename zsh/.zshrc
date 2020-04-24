@@ -164,12 +164,13 @@ alias -g gi='| grep -i'      # usage: ps aux gi ruby => ps aux | grep -i ruby
 #
 alias -s rb=vim              # usage: user.rb => vim user.rb
 
-## Powershell
-#  - https://github.com/justjanne/powerline-go
-#  - 
+## Powershell alternatives:
+#  https://github.com/justjanne/powerline-go
+#  https://github.com/b-ryan/powerline-shell
 
 function powerline_precmd() {
     PS1="$($GOPATH/bin/powerline-go -error $? -shell zsh)"
+    # PS1="$(powerline-shell --shell zsh $?)"
 }
 
 function install_powerline_precmd() {
@@ -182,7 +183,7 @@ function install_powerline_precmd() {
 }
 
 if [ "$TERM" != "linux" ]; then
-    install_powerline_precmd
+  install_powerline_precmd
 fi
 
 # https://gist.github.com/phette23/5270658#gistcomment-1265682
@@ -190,4 +191,5 @@ precmd() {
   # sets the tab title to current dir
   echo -ne "\e]1;${PWD##*/}\a"
 }
+
 [[ -f /Users/mathias.klippinge/src/klarna-app/bin/completion/klapp.zsh.sh ]] && . /Users/mathias.klippinge/src/klarna-app/bin/completion/klapp.zsh.sh || true
