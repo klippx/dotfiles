@@ -12,7 +12,8 @@
             master..
   gr = log --show-signature --graph --full-history --all --color --decorate
   unstage = reset HEAD --
-  cleanup = !git branch --list --merged | grep -v master | xargs git branch -d
+  # cleanup = !git branch --list --merged | grep -v master | xargs git branch -d
+  cleanup = !git branch -vv | egrep ': gone]' | awk '{print $1}' | xargs git branch -D
   publish = !git push -u origin $(git branch-name)
   branch-name = !git rev-parse --abbrev-ref HEAD
   pushf = push --force-with-lease
