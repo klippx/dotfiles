@@ -98,7 +98,7 @@ alias gw="git wut"
 
 export PASSWORD_STORE_DIR=$HOME/.password-store-klarna
 export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-export ANDROID_HOME="/usr/local/share/android-sdk"
+export ANDROID_HOME=~/Library/Android/sdk
 export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
 export GRADLE_USER_HOME="/usr/local/share/gradle"
 export M2_HOME="/usr/local/share/maven"
@@ -113,9 +113,12 @@ export NVM_DIR="$HOME/.nvm"
 
 # PATH modifications
 export PATH=$JAVA_HOME/bin:$PATH
-export PATH=$PATH:$HOME/flutter/bin
+# export PATH=$PATH:$HOME/flutter/bin
+export PATH=$PATH:$HOME/go/bin
 export PATH="/usr/local/sbin:$PATH"
+export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 # export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="/usr/local/opt/ruby/bin:$PATH"
 
 ### Keybinds
 #
