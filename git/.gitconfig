@@ -27,6 +27,7 @@
   whitespace = trailing-space,space-before-tab
   pager = diff-so-fancy | less --tabs=4 -RFX
   hooksPath = /Users/mathias.klippinge/.githooks
+  preloadIndex = false
 [pager]
   diff=true
 [branch]

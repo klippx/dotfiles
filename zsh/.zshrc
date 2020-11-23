@@ -167,9 +167,8 @@ alias -s rb=vim              # usage: user.rb => vim user.rb
 ## Powershell alternatives:
 #  https://github.com/justjanne/powerline-go
 #  https://github.com/b-ryan/powerline-shell
-
 function powerline_precmd() {
-    PS1="$($GOPATH/bin/powerline-go -error $? -shell zsh)"
+    PS1="$($GOPATH/bin/powerline-go -git-assume-unchanged-size 1 -error $? -shell zsh)"
     # PS1="$(powerline-shell --shell zsh $?)"
 }
 
