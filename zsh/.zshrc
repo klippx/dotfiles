@@ -158,6 +158,9 @@ alias pg_stop="pg_ctl -D /usr/local/var/postgres stop -s -m fast"
 alias mysql_start="/usr/local/bin/mysql.server start"
 alias mysql_stop="/usr/local/bin/mysql.server stop"
 alias psql='psql -eL /tmp/psql.log'
+alias cat='bat'
+alias ping='prettyping --nolegend'
+alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 
 # -- global
 #
@@ -171,8 +174,19 @@ alias -s rb=vim              # usage: user.rb => vim user.rb
 #  https://github.com/justjanne/powerline-go
 #  https://github.com/b-ryan/powerline-shell
 function powerline_precmd() {
-    PS1="$($GOPATH/bin/powerline-go -git-assume-unchanged-size 1 -error $? -shell zsh)"
+    # Old way:
+    #PS1="$($GOPATH/bin/powerline-go -git-assume-unchanged-size 1 -error $? -shell zsh)"
+    PS1="$($GOPATH/bin/powerline-go -error $? -jobs ${${(%):%j}:-0})"
+
+    # Really old way:
     # PS1="$(powerline-shell --shell zsh $?)"
+
+    # Uncomment the following line to automatically clear errors after showing
+    # them once. This not only clears the error for powerline-go, but also for
+    # everything else you run in that shell. Don't enable this if you're not
+    # sure this is what you want.
+
+    set "?"
 }
 
 function install_powerline_precmd() {

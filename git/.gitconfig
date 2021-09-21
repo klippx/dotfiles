@@ -17,6 +17,7 @@
   publish = !git push -u origin $(git branch-name)
   branch-name = !git rev-parse --abbrev-ref HEAD
   pushf = push --force-with-lease
+	alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
 [merge]
   tool = vimdiff
   stat = true
@@ -27,7 +28,7 @@
   whitespace = trailing-space,space-before-tab
   pager = diff-so-fancy | less --tabs=4 -RFX
   hooksPath = /Users/mathias.klippinge/.githooks
-  preloadIndex = false
+	preloadIndex = false
 [pager]
   diff=true
 [branch]

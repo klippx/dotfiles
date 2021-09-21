@@ -56,6 +56,10 @@ ensure_command safe-rm
 ln -fs /usr/local/bin/safe-rm /usr/local/bin/rm
 ensure_command diff-so-fancy
 ensure_command curl
+ensure_command fd
+ensure_command bat
+ensure_command prettyping
+ensure_command ncdu
 
 install_oh-my-zsh
 install_spf13-vim3
