@@ -60,6 +60,7 @@ ensure_command fd
 ensure_command bat
 ensure_command prettyping
 ensure_command ncdu
+ensure_command starship
 
 install_oh-my-zsh
 install_spf13-vim3

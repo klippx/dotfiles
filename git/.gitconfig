@@ -93,3 +93,7 @@
   locksverify = false
 [pull]
   rebase = true
+[sequence]
+	editor = interactive-rebase-tool
+[format]
+	pretty = oneline
