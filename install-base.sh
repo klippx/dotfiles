@@ -75,4 +75,7 @@ stow --target $HOME vim
 # stow --target $HOME pry
 # stow --target $HOME mysql
 
+brew tap homebrew/cask-fonts
+brew install --cask font-hack-nerd-font
+
 echo "Finished successfully."

@@ -117,8 +117,6 @@ export PATH=$JAVA_HOME/bin:$PATH
 export PATH=$PATH:$HOME/go/bin
 export PATH="/usr/local/sbin:$PATH"
 export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-# export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="/usr/local/opt/ruby/bin:$PATH"
 
 ### Keybinds
 #
@@ -126,7 +124,6 @@ bindkey -v
 
 ## scripts
 #
-[[ -f ~/.rvm/scripts/rvm ]] && source ~/.rvm/scripts/rvm
 [[ -s `brew --prefix`/etc/autojump.sh  ]] && . `brew --prefix`/etc/autojump.sh
 
 # direnv
@@ -181,3 +178,6 @@ precmd() {
 }
 
 [[ -f /Users/mathias.klippinge/src/klarna-app/bin/completion/klapp.zsh.sh ]] && . /Users/mathias.klippinge/src/klarna-app/bin/completion/klapp.zsh.sh || true
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
+. /usr/local/opt/asdf/libexec/asdf.sh
