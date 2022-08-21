@@ -17,7 +17,7 @@
   publish = !git push -u origin $(git branch-name)
   branch-name = !git rev-parse --abbrev-ref HEAD
   pushf = push --force-with-lease
-	alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
+  alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
 [merge]
   tool = vimdiff
   stat = true
@@ -28,7 +28,9 @@
   whitespace = trailing-space,space-before-tab
   pager = diff-so-fancy | less --tabs=4 -RFX
   hooksPath = /Users/mathias.klippinge/.githooks
-	preloadIndex = false
+  preloadIndex = false
+  untrackedCache = true
+  splitIndex = true
 [pager]
   diff=true
 [branch]
@@ -43,6 +45,7 @@
   enabled = true
 [fetch]
   prune = true
+  pruneTags = true
 [interactive]
   # Temporary replaced "diff-so-fancy" with bundled "diff-highlight".
   #
@@ -94,6 +97,6 @@
 [pull]
   rebase = true
 [sequence]
-	editor = interactive-rebase-tool
+  editor = interactive-rebase-tool
 [format]
-	pretty = oneline
+  pretty = medium
