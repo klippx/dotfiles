@@ -96,27 +96,11 @@ export ARCHFLAGS="-arch x86_64"
 alias wt="curl http://wttr.in/"
 alias gw="git wut"
 
-export PASSWORD_STORE_DIR=$HOME/.password-store-klarna
-export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-export ANDROID_HOME=~/Library/Android/sdk
-export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
-export GRADLE_USER_HOME="/usr/local/share/gradle"
-export M2_HOME="/usr/local/share/maven"
 export GNUTERM="qt"
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 
-# Nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# PATH modifications
-export PATH=$JAVA_HOME/bin:$PATH
-# export PATH=$PATH:$HOME/flutter/bin
-export PATH=$PATH:$HOME/go/bin
-export PATH="/usr/local/sbin:$PATH"
-export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+export PATH="/usr/local/sbin:$GOPATH/bin:$PATH"
 
 ### Keybinds
 #
@@ -127,14 +111,14 @@ bindkey -v
 [[ -s `brew --prefix`/etc/autojump.sh  ]] && . `brew --prefix`/etc/autojump.sh
 
 # direnv
-eval "$(direnv hook $SHELL)"
+# eval "$(direnv hook $SHELL)"
 
 # Fuzzy finder - https://github.com/junegunn/fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 ### zsh settings
 #
-#autoload -U compinit && compinit
+autoload -Uz compinit && compinit
 export KEYTIMEOUT=1
 export LC_ALL=en_US.utf-8
 export LANG="$LC_ALL"
@@ -155,7 +139,7 @@ alias pg_stop="pg_ctl -D /usr/local/var/postgres stop -s -m fast"
 alias mysql_start="/usr/local/bin/mysql.server start"
 alias mysql_stop="/usr/local/bin/mysql.server stop"
 alias psql='psql -eL /tmp/psql.log'
-alias cat='bat'
+alias cat='bat --style=header,grid,snip'
 alias ping='prettyping --nolegend'
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 
@@ -177,7 +161,8 @@ precmd() {
   echo -ne "\e]1;${PWD##*/}\a"
 }
 
-[[ -f /Users/mathias.klippinge/src/klarna-app/bin/completion/klapp.zsh.sh ]] && . /Users/mathias.klippinge/src/klarna-app/bin/completion/klapp.zsh.sh || true
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-. /usr/local/opt/asdf/libexec/asdf.sh
+# export VOLTA_HOME="$HOME/.volta"
+# export PATH="$VOLTA_HOME/bin:$PATH"
+export HOMEBREW_NO_AUTO_UPDATE=1
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"

@@ -53,7 +53,8 @@ ensure_command fzf
 ensure_command direnv
 ensure_command autojump
 ensure_command safe-rm
-ln -fs /usr/local/bin/safe-rm /usr/local/bin/rm
+ensure_command git-interactive-rebase-tool
+# ln -fs /usr/local/bin/safe-rm /usr/local/bin/rm
 ensure_command diff-so-fancy
 ensure_command curl
 ensure_command fd
@@ -71,9 +72,7 @@ stow --target $HOME/.ssh .ssh
 stow --target $HOME git
 stow --target $HOME zsh
 stow --target $HOME vim
-# stow --target $HOME psql
-# stow --target $HOME pry
-# stow --target $HOME mysql
+stow --target $HOME psql
 
 brew tap homebrew/cask-fonts
 brew install --cask font-hack-nerd-font

@@ -100,3 +100,5 @@
   editor = interactive-rebase-tool
 [format]
   pretty = medium
+[init]
+	defaultBranch = main
