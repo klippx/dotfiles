@@ -113,25 +113,30 @@ bindkey -v
 # direnv
 # eval "$(direnv hook $SHELL)"
 
-# Fuzzy finder - https://github.com/junegunn/fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
 ### zsh settings
-#
+# 
+# NOTE: This line screws p yarn completions, and need to come before sourcing it.
 autoload -Uz compinit && compinit
 export KEYTIMEOUT=1
 export LC_ALL=en_US.utf-8
 export LANG="$LC_ALL"
 
+# Fuzzy finder - https://github.com/junegunn/fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# NOTE:
+# git clone https://github.com/chrisands/zsh-yarn-completions.git ~/.zsh-yarn-completions
+source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
+
 ### Fix for catalina: https://stackoverflow.com/questions/58272830/python-crashing-on-macos-10-15-beta-19a582a-with-usr-lib-libcrypto-dylib
-export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
-export DYLD_LIBRARY_PATH=/usr/local/opt/openssl/lib:$DYLD_LIBRARY_PATH
+# export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
+# export DYLD_LIBRARY_PATH=/usr/local/opt/openssl/lib:$DYLD_LIBRARY_PATH
 
 ### Aliases
 #
 # -- normal
 alias l="ls -lrt"
-alias ll="ls -larth"
+alias ll="ls -la"
 alias lf="ls -lartFh"
 alias dir="ls -lrtFh | grep '/$'"
 alias pg_start="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start"
@@ -155,10 +160,17 @@ if [ "$TERM" != "linux" ]; then
   eval "$(starship init zsh)"
 fi
 
+# Read local secrets
+[ -f ~/.zsh.local ] && source ~/.zsh.local
+
 # https://gist.github.com/phette23/5270658#gistcomment-1265682
 precmd() {
   # sets the tab title to current dir
   echo -ne "\e]1;${PWD##*/}\a"
+}
+
+ktc () {
+  stern $1 -c $1 -e "kube-probe|Checking status...|health check|Accepted connection from /100" ${@:2}
 }
 
 # export VOLTA_HOME="$HOME/.volta"
@@ -166,3 +178,4 @@ precmd() {
 export HOMEBREW_NO_AUTO_UPDATE=1
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
