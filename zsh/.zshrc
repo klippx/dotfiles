@@ -60,7 +60,7 @@ DISABLE_AUTO_TITLE="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git asdf)
+plugins=(git asdf zoxide)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -109,10 +109,10 @@ bindkey -v
 
 ## scripts
 #
-[[ -s `brew --prefix`/etc/autojump.sh  ]] && . `brew --prefix`/etc/autojump.sh
+# <nothing here yet>
 
 # direnv
-# eval "$(direnv hook $SHELL)"
+eval "$(direnv hook $SHELL)"
 
 ### zsh settings
 # 
@@ -148,6 +148,7 @@ alias psql='psql -eL /tmp/psql.log'
 alias cat='bat --style=header,grid,snip'
 alias ping='prettyping --nolegend'
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
+alias terraform='tofu'
 
 # -- global
 #

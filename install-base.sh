@@ -51,7 +51,7 @@ ensure_command zsh
 ensure_command vim
 ensure_command fzf
 ensure_command direnv
-ensure_command autojump
+ensure_command zoxide
 ensure_command safe-rm
 ensure_command git-interactive-rebase-tool
 # ln -fs /usr/local/bin/safe-rm /usr/local/bin/rm
