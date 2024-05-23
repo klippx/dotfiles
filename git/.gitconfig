@@ -22,7 +22,7 @@
   tool = vimdiff
   stat = true
 [core]
-  excludesfile = ${HOME}/.gitignore_global
+	excludesfile = ~/.gitignore_global
   precomposeunicode = true
   editor = vim
   whitespace = trailing-space,space-before-tab
