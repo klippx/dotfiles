@@ -60,7 +60,7 @@ DISABLE_AUTO_TITLE="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git asdf)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -79,7 +79,7 @@ else
 fi
 
 # Compilation flags
-export ARCHFLAGS="-arch x86_64"
+# export ARCHFLAGS="-arch x86_64"
 
 # ssh
 # export SSH_KEY_PATH="~/.ssh/dsa_id"
@@ -95,6 +95,7 @@ export ARCHFLAGS="-arch x86_64"
 #
 alias wt="curl http://wttr.in/"
 alias gw="git wut"
+alias 'gcam!'="git commit --amend"
 
 export GNUTERM="qt"
 export GOROOT=/usr/local/go
@@ -156,10 +157,6 @@ alias -g gi='| grep -i'      # usage: ps aux gi ruby => ps aux | grep -i ruby
 #
 alias -s rb=vim              # usage: user.rb => vim user.rb
 
-if [ "$TERM" != "linux" ]; then
-  eval "$(starship init zsh)"
-fi
-
 # Read local secrets
 [ -f ~/.zsh.local ] && source ~/.zsh.local
 
@@ -173,9 +170,25 @@ ktc () {
   stern $1 -c $1 -e "kube-probe|Checking status...|health check|Accepted connection from /100" ${@:2}
 }
 
+kdiff () {
+	service=${1} env=${2}
+	helm template $service ./helm-base -f ./helm-envs/euwest1-$env.yaml -f ./helm-releases/$service/$service.yaml -f ./helm-releases/$service/euwest1-$env.yaml | kubectl --context $env diff -f -
+}
+
 # export VOLTA_HOME="$HOME/.volta"
 # export PATH="$VOLTA_HOME/bin:$PATH"
 export HOMEBREW_NO_AUTO_UPDATE=1
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+export APOLLO_TELEMETRY_DISABLED=true
 
+# pnpm
+export PNPM_HOME="/Users/MKLIPPIN/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+# pnpm end
+
+# bun completions
+[ -s "/Users/MKLIPPIN/.oh-my-zsh/completions/_bun" ] && source "/Users/MKLIPPIN/.oh-my-zsh/completions/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
