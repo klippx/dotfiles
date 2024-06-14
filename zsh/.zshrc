@@ -123,11 +123,11 @@ export LC_ALL=en_US.utf-8
 export LANG="$LC_ALL"
 
 # Fuzzy finder - https://github.com/junegunn/fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source <(fzf --zsh)
 
 # NOTE:
 # git clone https://github.com/chrisands/zsh-yarn-completions.git ~/.zsh-yarn-completions
-source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
+# source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
 
 ### Fix for catalina: https://stackoverflow.com/questions/58272830/python-crashing-on-macos-10-15-beta-19a582a-with-usr-lib-libcrypto-dylib
 # export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
@@ -149,6 +149,8 @@ alias cat='bat --style=header,grid,snip'
 alias ping='prettyping --nolegend'
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias terraform='tofu'
+# https://code.visualstudio.com/sha/download?build=stable&os=cli-darwin-arm64
+alias code='/Applications/code'
 
 # -- global
 #

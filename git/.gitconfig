@@ -1,5 +1,6 @@
 [push]
   default = upstream
+  autoSetupRemote = true
 [user]
   name = Mathias Klippinge
   email = mathias.klippinge@gmail.com

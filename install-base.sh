@@ -62,19 +62,19 @@ ensure_command bat
 ensure_command prettyping
 ensure_command ncdu
 ensure_command starship
+ensure_command gh
 
 install_oh-my-zsh
 install_spf13-vim3
 
 mkdir -p $HOME/.ssh
 stow --target $HOME/.ssh .ssh
-
 stow --target $HOME git
 stow --target $HOME zsh
 stow --target $HOME vim
 stow --target $HOME psql
 
-brew tap homebrew/cask-fonts
-brew install --cask font-hack-nerd-font
+# brew tap homebrew/cask-fonts
+# brew install --cask font-hack-nerd-font
 
 echo "Finished successfully."
