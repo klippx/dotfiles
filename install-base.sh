@@ -57,6 +57,7 @@ stow --target $HOME git
 stow --target $HOME zsh
 stow --target $HOME vim
 stow --target $HOME psql
+stow --target $HOME asdf
 
 # Cannot detect these as they are not "commands"
 brew install git-interactive-rebase-tool
