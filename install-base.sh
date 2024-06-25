@@ -39,8 +39,7 @@ ensure_command fzf
 ensure_command direnv
 ensure_command zoxide
 ensure_command safe-rm
-ensure_command git-interactive-rebase-tool
-# ln -fs /usr/local/bin/safe-rm /usr/local/bin/rm
+ln -fs /opt/homebrew/opt/safe-rm/bin/safe-rm /opt/homebrew/bin/rm
 ensure_command diff-so-fancy
 ensure_command curl
 ensure_command fd
@@ -59,7 +58,11 @@ stow --target $HOME zsh
 stow --target $HOME vim
 stow --target $HOME psql
 
-# brew tap homebrew/cask-fonts
-# brew install --cask font-hack-nerd-font
+# Cannot detect these as they are not "commands"
+brew install git-interactive-rebase-tool
+brew install font-hack-nerd-font
+brew install font-iosevka-ss12
+brew install font-monaspace
+
 
 echo "Finished successfully."
