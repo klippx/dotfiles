@@ -98,10 +98,9 @@ alias gw="git wut"
 alias 'gcam!'="git commit --amend"
 
 export GNUTERM="qt"
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-
-export PATH="/usr/local/sbin:$GOPATH/bin:$PATH"
+export GOROOT=$(brew --prefix go)/libexec
+export GOBIN=/Users/MKLIPPIN/go/bin
+export PATH=$PATH:$GOBIN
 
 ### Keybinds
 #
