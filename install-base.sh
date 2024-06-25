@@ -31,20 +31,6 @@ install_oh-my-zsh() {
   fi
 }
 
-install_spf13-vim3() {
-  if [ -e ~/.spf13-vim-3  ]
-    then
-      echo "SPF13 already installed, skipping..."
-    else
-      echo "SPF13 not found, installing..."
-      curl http://j.mp/spf13-vim3 -L -o - | sh
-      rm -f ~/.gvimrc.local
-      rm -f ~/.vimrc.before.local
-      rm -f ~/.vimrc.bundles.local
-      rm -f ~/.vimrc.local
-  fi
-}
-
 ensure_command stow
 ensure_command git
 ensure_command zsh
@@ -65,7 +51,6 @@ ensure_command starship
 ensure_command gh
 
 install_oh-my-zsh
-install_spf13-vim3
 
 mkdir -p $HOME/.ssh
 stow --target $HOME/.ssh .ssh
