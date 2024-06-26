@@ -58,6 +58,8 @@ stow --target $HOME zsh
 stow --target $HOME vim
 stow --target $HOME psql
 stow --target $HOME asdf
+mkdir -p $HOME/.config
+stow --target $HOME/.config starship
 
 # Cannot detect these as they are not "commands"
 brew install git-interactive-rebase-tool
