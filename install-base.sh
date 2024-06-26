@@ -66,6 +66,7 @@ brew install git-interactive-rebase-tool
 brew install font-hack-nerd-font
 brew install font-iosevka-ss12
 brew install font-monaspace
+brew install font-droid-sans-mono-nerd-font
 
 
 echo "Finished successfully."

@@ -15,7 +15,7 @@ $character\
 """
 
 [directory]
-format = "[ ﱮ $path ]($style)"
+format = "[  $path ]($style)"
 style = "fg:#E4E4E4 bg:#3B76F0"
 
 [git_branch]
@@ -24,13 +24,15 @@ symbol = "  "
 style = "fg:#1C3A5E bg:#FCF392"
 
 [git_status]
-format = '[$all_status]($style)'
-style = "fg:#1C3A5E bg:#FCF392"
+format = '[\[$all_status$ahead_behind\] ]($style)'
+# format = '[$all_status]($style)'
+style = "fg:green bg:#FCF392"
 
 [git_metrics]
-format = "([+$added]($added_style))[]($added_style)"
+format = "([+$added ]($added_style))([-$deleted ]($deleted_style))[]($added_style)"
+# format = "([+$added]($added_style))[]($added_style)"
 added_style = "fg:#1C3A5E bg:#FCF392"
-deleted_style = "fg:bright-red bg:235"
+deleted_style = "fg:bright-red bg:#FCF392"
 disabled = false
 
 [hg_branch]
@@ -42,8 +44,8 @@ format = "[  $duration ]($style)"
 style = "fg:bright-white bg:18"
 
 [character]
-success_symbol = '[ ➜](bold green) '
-error_symbol = '[ ✗](#E84D44) '
+success_symbol = '[ 󱗆](green) '
+error_symbol = '[ 󰞇](#E84D44) '
 
 [time]
 disabled = false
