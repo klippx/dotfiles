@@ -48,6 +48,7 @@ ensure_command prettyping
 ensure_command ncdu
 ensure_command starship
 ensure_command gh
+ensure_command pstree
 
 install_oh-my-zsh
 

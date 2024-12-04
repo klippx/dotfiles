@@ -114,7 +114,7 @@ bindkey -v
 eval "$(direnv hook $SHELL)"
 
 ### zsh settings
-# 
+#
 # NOTE: This line screws p yarn completions, and need to come before sourcing it.
 autoload -Uz compinit && compinit
 export KEYTIMEOUT=1
@@ -177,6 +177,16 @@ kdiff () {
 	helm template $service ./helm-base -f ./helm-envs/euwest1-$env.yaml -f ./helm-releases/$service/$service.yaml -f ./helm-releases/$service/euwest1-$env.yaml | kubectl --context $env diff -f -
 }
 
+# Function to show process tree by port
+ptree() {
+  if [ -z "$1" ]; then
+    echo "Shows the process tree of the process listening on the given port."
+    echo "Usage: ptree <port-number>"
+    return 1
+  fi
+  lsof -i :"$1" | tail -1 | awk '{print $2}' | xargs -r pstree -g 3 -p
+}
+
 # export VOLTA_HOME="$HOME/.volta"
 # export PATH="$VOLTA_HOME/bin:$PATH"
 export HOMEBREW_NO_AUTO_UPDATE=1
@@ -197,3 +207,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # PS1
 eval "$(starship init zsh)"
+
+# Generated for envman. Do not edit.
+[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"

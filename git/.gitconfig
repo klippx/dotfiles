@@ -103,3 +103,7 @@
   pretty = medium
 [init]
 	defaultBranch = main
+[url "git@github.com:volvo-cars"]
+   insteadOf = https://github.com/volvo-cars
+[url "git@github.com:volvo-cars-se"]
+   insteadOf = https://github.com/volvo-cars-se
