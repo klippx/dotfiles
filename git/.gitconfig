@@ -28,10 +28,10 @@
   editor = vim
   whitespace = trailing-space,space-before-tab
   pager = diff-so-fancy | less --tabs=4 -RFX
-  hooksPath = /Users/mathias.klippinge/.githooks
   preloadIndex = false
   untrackedCache = true
   splitIndex = true
+  autocrlf = input
 [pager]
   diff=true
 [branch]
