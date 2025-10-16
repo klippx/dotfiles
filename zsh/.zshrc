@@ -187,8 +187,6 @@ ptree() {
   lsof -i :"$1" | tail -1 | awk '{print $2}' | xargs -r pstree -g 3 -p
 }
 
-# export VOLTA_HOME="$HOME/.volta"
-# export PATH="$VOLTA_HOME/bin:$PATH"
 export HOMEBREW_NO_AUTO_UPDATE=1
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 export APOLLO_TELEMETRY_DISABLED=true
