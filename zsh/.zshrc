@@ -98,8 +98,6 @@ alias gw="git wut"
 alias 'gcam!'="git commit --amend"
 
 export GNUTERM="qt"
-export GOROOT=$(brew --prefix go)/libexec
-export GOBIN=/Users/MKLIPPIN/go/bin
 export PATH=$PATH:$GOBIN
 
 ### Keybinds
@@ -149,7 +147,7 @@ alias ping='prettyping --nolegend'
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias terraform='tofu'
 # https://code.visualstudio.com/sha/download?build=stable&os=cli-darwin-arm64
-alias code='/Applications/code'
+alias code='/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code'
 
 # -- global
 #
@@ -209,4 +207,15 @@ eval "$(starship init zsh)"
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 export GOTOOLCHAIN=local
+
+# vscode shell integration
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
+
+# mise
 eval "$(~/.local/bin/mise activate zsh)"
+
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/MKLIPPIN/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
