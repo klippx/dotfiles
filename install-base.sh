@@ -20,17 +20,6 @@ ensure_command() {
   fi
 }
 
-install_oh-my-zsh() {
-  if [ -e ~/.oh-my-zsh ]
-    then
-      echo "Oh my zsh already installed, skipping..."
-    else
-      echo "Oh my zsh not found, installing..."
-      curl -L https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | sh
-      rm -f ~/.zshrc
-  fi
-}
-
 ensure_command stow
 ensure_command git
 ensure_command zsh
@@ -47,10 +36,9 @@ ensure_command bat
 ensure_command prettyping
 ensure_command ncdu
 ensure_command starship
+ensure_command mise
 ensure_command gh
 ensure_command pstree
-
-install_oh-my-zsh
 
 mkdir -p $HOME/.ssh
 stow --target $HOME/.ssh .ssh
@@ -58,7 +46,6 @@ stow --target $HOME git
 stow --target $HOME zsh
 stow --target $HOME vim
 stow --target $HOME psql
-stow --target $HOME asdf
 mkdir -p $HOME/.config
 stow --target $HOME/.config starship
 

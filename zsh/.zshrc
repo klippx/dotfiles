@@ -1,72 +1,9 @@
-# Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
-
-# Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-#ZSH_THEME="ys"
-#ZSH_THEME="robbyrusselll"
-#ZSH_THEME="adben"          # NA: ps1_fortune
-#ZSH_THEME="agnoster"       # Lite småsnygga färger/grafik men svårläst path
-#ZSH_THEME="bureau"         # Average. Git repot för lång till höger
-#ZSH_THEME="candy-kingdom"  # NA: battery_time_remaining / battery_pct_prompt
-#ZSH_THEME="dieter"         # Meh
-#ZSH_THEME="fino-time"      # Pretty good! <--- disabled due to trialing Powerline Shell
-#ZSH_THEME="fino"           # Funkar inte riktigt
-#ZSH_THEME="flazz"          # Meh
-#ZSH_THEME="gallois"        # Intressant - git repo / ruby version till höger (behöver inte se dem jämt) men prompten bygger horisontellt
-#ZSH_THEME="kardan"         # ALLT till höger - även path. Känns minimalistisk utan att egentligen vara det.
-#ZSH_THEME="mortalscumbag"  # Bleh
-#ZSH_THEME="steeef"         # ys-klon
-#ZSH_THEME="sunrise"        # Bleh
-#ZSH_THEME=""
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git zoxide)
-
-source $ZSH/oh-my-zsh.sh
-
-# User settings
+### ZSH History
 #
-# export MANPATH="/usr/local/man:$MANPATH"
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE=~/.zsh_history
+setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -84,14 +21,7 @@ fi
 # ssh
 # export SSH_KEY_PATH="~/.ssh/dsa_id"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+### Aliases (early — before keybinds)
 #
 alias wt="curl http://wttr.in/"
 alias gw="git wut"
@@ -122,6 +52,9 @@ export LANG="$LC_ALL"
 # Fuzzy finder - https://github.com/junegunn/fzf
 source <(fzf --zsh)
 
+# zoxide
+eval "$(zoxide init zsh)"
+
 # NOTE:
 # git clone https://github.com/chrisands/zsh-yarn-completions.git ~/.zsh-yarn-completions
 # source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
@@ -132,6 +65,31 @@ source <(fzf --zsh)
 
 ### Aliases
 #
+# -- git (common OMZ git plugin aliases)
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gc='git commit --verbose'
+alias gcmsg='git commit --message'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gf='git fetch'
+alias gl='git pull'
+alias glog='git log --oneline --decorate --graph'
+alias gp='git push'
+alias gpf='git push --force-with-lease'
+alias gst='git status'
+alias gsw='git switch'
+alias gswc='git switch --create'
+alias grh='git reset HEAD'
+alias grhh='git reset --hard HEAD'
+alias grb='git rebase'
+alias grbi='git rebase --interactive'
+
 # -- normal
 alias l="ls -lrt"
 alias ll="ls -la"
@@ -221,9 +179,6 @@ export APOLLO_TELEMETRY_DISABLED=true
 export PNPM_HOME="/Users/MKLIPPIN/Library/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 # pnpm end
-
-# bun completions
-[ -s "/Users/MKLIPPIN/.oh-my-zsh/completions/_bun" ] && source "/Users/MKLIPPIN/.oh-my-zsh/completions/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
