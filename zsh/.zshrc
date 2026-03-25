@@ -44,7 +44,7 @@ eval "$(direnv hook $SHELL)"
 ### zsh settings
 #
 # NOTE: fpath additions (e.g. Docker completions) must come before compinit.
-fpath=(/Users/MKLIPPIN/.docker/completions $fpath)
+fpath=($HOME/.docker/completions $fpath)
 # Only re-run compaudit once a day; use cached dump otherwise.
 autoload -Uz compinit
 if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
@@ -183,7 +183,7 @@ export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 export APOLLO_TELEMETRY_DISABLED=true
 
 # pnpm
-export PNPM_HOME="/Users/MKLIPPIN/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 # pnpm end
 
