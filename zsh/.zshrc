@@ -147,7 +147,9 @@ alias ping='prettyping --nolegend'
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias terraform='tofu'
 # https://code.visualstudio.com/sha/download?build=stable&os=cli-darwin-arm64
-alias code='/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code'
+alias code='/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code'
+# Copilot with allowed shell tools:
+alias copilot='copilot --allow-tool "shell(gh:*), shell(python3), shell(mkdir), shell(git:*), shell(pnpm:*), shell(sed), shell(awk), shell(xargs), shell(grep)"'
 
 # -- global
 #
@@ -170,9 +172,35 @@ ktc () {
   stern $1 -c $1 -e "kube-probe|Checking status...|health check|Accepted connection from /100" ${@:2}
 }
 
-kdiff () {
-	service=${1} env=${2}
-	helm template $service ./helm-base -f ./helm-envs/euwest1-$env.yaml -f ./helm-releases/$service/$service.yaml -f ./helm-releases/$service/euwest1-$env.yaml | kubectl --context $env diff -f -
+# Kubernetes template functions for FedGraph GitOps
+function ktempl() {
+  service=${1}
+  env=${2}
+  region=${3:-weu}
+  context="${region}-${env}"
+
+  extra_file="./helm-releases/$service/$service-ecp.yaml"
+
+  helm template --debug --kube-context $context $service ./helm-base \
+    --set debugDiff=true \
+    -n federated-graph \
+    -f ./helm-envs/${region}-$env.yaml \
+    -f $extra_file \
+    -f ./helm-releases/$service/${region}-$env.yaml
+}
+
+function kdiff() {
+  service=${1}
+  env=${2}
+  region=${3:-weu}
+
+  if [[ $region == "weu" ]]; then
+    context="${region}-${env}"
+  else
+    context="gf-${env}"
+  fi
+
+  ktempl $service $env $region
 }
 
 # Function to show process tree by port
@@ -213,6 +241,9 @@ export GOTOOLCHAIN=local
 
 # mise
 eval "$(~/.local/bin/mise activate zsh)"
+
+# fgctl
+export PATH=$PATH:$HOME/.fgctl/bin
 
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/MKLIPPIN/.docker/completions $fpath)
