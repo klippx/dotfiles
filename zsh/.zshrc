@@ -43,8 +43,15 @@ eval "$(direnv hook $SHELL)"
 
 ### zsh settings
 #
-# NOTE: This line screws p yarn completions, and need to come before sourcing it.
-autoload -Uz compinit && compinit
+# NOTE: fpath additions (e.g. Docker completions) must come before compinit.
+fpath=(/Users/MKLIPPIN/.docker/completions $fpath)
+# Only re-run compaudit once a day; use cached dump otherwise.
+autoload -Uz compinit
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
 export KEYTIMEOUT=1
 export LC_ALL=en_US.utf-8
 export LANG="$LC_ALL"
@@ -199,9 +206,3 @@ eval "$(~/.local/bin/mise activate zsh)"
 
 # fgctl
 export PATH=$PATH:$HOME/.fgctl/bin
-
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/MKLIPPIN/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
