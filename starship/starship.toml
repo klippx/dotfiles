@@ -14,7 +14,7 @@ $character\
 """
 
 [cmd_duration]
-min_time = 100
+min_time = 500
 show_milliseconds = true
 format = "[](fg:#1C3A5E)[ \uf11e $duration ]($style)[](fg:#1C3A5E)"
 style = "fg:bright-white bg:#1C3A5E"
