@@ -18,7 +18,6 @@ brew "fd"                           # find replacement
 brew "jq"
 brew "yq"
 brew "ncdu"                         # du replacement
-brew "coreutils"
 brew "curl"
 brew "pstree"
 brew "prettyping"                   # ping replacement
