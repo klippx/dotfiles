@@ -1,47 +1,42 @@
-# https://github.com/theRubberDuckiee/dev-environment-files/blob/main/starship.toml
 format = """\
-[](bg:#000000AA fg:#7DF9AA)\
-[󰀵 ](bg:#7DF9AA fg:#090c0c)\
-[](fg:#7DF9AA bg:#1C3A5E)\
+[\uE0C2 ](fg:#7DF9AA)\
 $time\
-[](fg:#1C3A5E bg:#3B76F0)\
+[\uE0CA ](bg:#7DF9AA fg:#3B76F0)\
 $directory\
-[](fg:#3B76F0 bg:#FCF392)\
+[\uE0C8](fg:#3B76F0 bg:#FCF392)\
 $git_branch\
 $git_status\
 $git_metrics\
-[](fg:#FCF392 bg:#000000AA)\
+[\uE0C0](fg:#FCF392)\
+\n\
+$cmd_duration\
 $character\
 """
+
+[cmd_duration]
+min_time = 100
+show_milliseconds = true
+format = "[](fg:#1C3A5E)[ \uf11e $duration ]($style)[](fg:#1C3A5E)"
+style = "fg:bright-white bg:#1C3A5E"
 
 [directory]
 format = "[  $path ]($style)"
 style = "fg:#E4E4E4 bg:#3B76F0"
 
 [git_branch]
-format = '[ $symbol$branch(:$remote_branch) ]($style)'
-symbol = "  "
+format = '[  $symbol$branch(:$remote_branch) ]($style)'
+symbol = " "
 style = "fg:#1C3A5E bg:#FCF392"
 
 [git_status]
 format = '[\[$all_status$ahead_behind\] ]($style)'
-# format = '[$all_status]($style)'
 style = "fg:green bg:#FCF392"
 
 [git_metrics]
-format = "([+$added ]($added_style))([-$deleted ]($deleted_style))[]($added_style)"
-# format = "([+$added]($added_style))[]($added_style)"
+format = "([+$added ]($added_style))([-$deleted ]($deleted_style))"
 added_style = "fg:#1C3A5E bg:#FCF392"
 deleted_style = "fg:bright-red bg:#FCF392"
 disabled = false
-
-[hg_branch]
-format = "[ $symbol$branch ]($style)"
-symbol = " "
-
-[cmd_duration]
-format = "[  $duration ]($style)"
-style = "fg:bright-white bg:18"
 
 [character]
 success_symbol = '[ 󱗆](green) '
@@ -49,6 +44,5 @@ error_symbol = '[ 󰞇](#E84D44) '
 
 [time]
 disabled = false
-time_format = "%R" # Hour:Minute Format
-style = "bg:#1d2230"
-format = '[[ 󱑍 $time ](bg:#1C3A5E fg:#8DFBD2)]($style)'
+time_format = "%R"                                      # Hour:Minute Format
+format = '[󱑍 $time ](bg:#7DF9AA fg:#1C3A5E)'
