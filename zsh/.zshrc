@@ -107,12 +107,13 @@ alias pg_stop="pg_ctl -D /usr/local/var/postgres stop -s -m fast"
 alias mysql_start="/usr/local/bin/mysql.server start"
 alias mysql_stop="/usr/local/bin/mysql.server stop"
 alias psql='psql -eL /tmp/psql.log'
-alias cat='bat --style=header,grid,snip'
+# alias cat='bat --style=header,grid,snip'
 alias ping='prettyping --nolegend'
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
-alias terraform='tofu'
+
 # https://code.visualstudio.com/sha/download?build=stable&os=cli-darwin-arm64
 alias code='/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code'
+
 # Copilot with allowed shell tools:
 alias copilot='copilot --allow-tool "shell(gh:*), shell(python3), shell(mkdir), shell(git:*), shell(pnpm:*), shell(sed), shell(awk), shell(xargs), shell(grep)"'
 

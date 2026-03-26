@@ -48,6 +48,7 @@ stow --target $HOME vim
 stow --target $HOME psql
 mkdir -p $HOME/.config
 stow --target $HOME/.config starship
+stow --target $HOME/.config ghostty
 
 # Cannot detect these as they are not "commands"
 brew install git-interactive-rebase-tool
@@ -55,6 +56,5 @@ brew install font-hack-nerd-font
 brew install font-iosevka-ss12
 brew install font-monaspace
 brew install font-droid-sans-mono-nerd-font
-
 
 echo "Finished successfully."
