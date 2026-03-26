@@ -1,45 +1,19 @@
 #!/bin/bash
 set -eu
 
-install_command() {
-  if hash pacman 2>/dev/null; then
-    sudo pacman -S $1
-  elif hash apt-get 2>/dev/null; then
-    sudo apt-get install $1
-  elif hash brew 2>/dev/null; then
-    brew install $1
-  fi
-}
+# Install Homebrew if missing
+if ! hash brew 2>/dev/null; then
+  echo "Homebrew not found, installing..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
-ensure_command() {
-  if hash $1 2>/dev/null; then
-    echo "$1 found, skipping..."
-  else
-    echo "$1 not found, installing.."
-    install_command $1
-  fi
-}
+# Install all packages declaratively
+brew bundle --file="$(dirname "$0")/Brewfile"
 
-ensure_command stow
-ensure_command git
-ensure_command zsh
-ensure_command vim
-ensure_command fzf
-ensure_command direnv
-ensure_command zoxide
-ensure_command safe-rm
+# safe-rm needs to shadow the system rm
 ln -fs /opt/homebrew/opt/safe-rm/bin/safe-rm /opt/homebrew/bin/rm
-ensure_command diff-so-fancy
-ensure_command curl
-ensure_command fd
-ensure_command bat
-ensure_command prettyping
-ensure_command ncdu
-ensure_command starship
-ensure_command mise
-ensure_command gh
-ensure_command pstree
 
+# Stow dotfiles
 mkdir -p $HOME/.ssh
 stow --target $HOME/.ssh .ssh
 stow --target $HOME git
@@ -50,11 +24,5 @@ mkdir -p $HOME/.config
 stow --target $HOME/.config starship
 stow --target $HOME/.config ghostty
 
-# Cannot detect these as they are not "commands"
-brew install git-interactive-rebase-tool
-brew install font-hack-nerd-font
-brew install font-iosevka-ss12
-brew install font-monaspace
-brew install font-droid-sans-mono-nerd-font
-
 echo "Finished successfully."
+
