@@ -31,6 +31,9 @@ brew "helm"
 brew "k9s"
 brew "stern"                        # multi-pod log tailing
 
+# Database
+brew "libpq"                        # pg_dump, pg_restore, psql etc. (client only)
+
 # Misc
 tap "remotemobprogramming/brew"
 brew "remotemobprogramming/brew/mob" # mob programming

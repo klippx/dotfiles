@@ -29,6 +29,7 @@ alias 'gcam!'="git commit --amend"
 
 export GNUTERM="qt"
 export PATH=$PATH:$GOBIN
+export GOTOOLCHAIN=local
 
 ### Keybinds
 #
@@ -117,24 +118,16 @@ alias code='/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/co
 # Copilot with allowed shell tools:
 alias copilot='copilot --allow-tool "shell(gh:*), shell(python3), shell(mkdir), shell(git:*), shell(pnpm:*), shell(sed), shell(awk), shell(xargs), shell(grep)"'
 
-# -- global
-#
-alias -g gi='| grep -i'      # usage: ps aux gi ruby => ps aux | grep -i ruby
-
-# -- suffix
-#
-alias -s rb=vim              # usage: user.rb => vim user.rb
-
 # Read local secrets
 [ -f ~/.zsh.local ] && source ~/.zsh.local
 
 # https://gist.github.com/phette23/5270658#gistcomment-1265682
-precmd() {
+function precmd() {
   # sets the tab title to current dir
   echo -ne "\e]1;${PWD##*/}\a"
 }
 
-ktc () {
+function ktc() {
   stern $1 -c $1 -e "kube-probe|Checking status...|health check|Accepted connection from /100" ${@:2}
 }
 
@@ -162,15 +155,13 @@ function kdiff() {
 
   if [[ $region == "weu" ]]; then
     context="${region}-${env}"
-  else
-    context="gf-${env}"
   fi
 
   ktempl $service $env $region
 }
 
 # Function to show process tree by port
-ptree() {
+function ptree() {
   if [ -z "$1" ]; then
     echo "Shows the process tree of the process listening on the given port."
     echo "Usage: ptree <port-number>"
@@ -179,31 +170,17 @@ ptree() {
   lsof -i :"$1" | tail -1 | awk '{print $2}' | xargs -r pstree -g 3 -p
 }
 
+export PATH="$HOME/.local/bin:$PATH"
 export HOMEBREW_NO_AUTO_UPDATE=1
-export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
-export APOLLO_TELEMETRY_DISABLED=true
-
-# pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
-export PATH="$PNPM_HOME:$PATH"
-# pnpm end
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
 
 # PS1
 eval "$(starship init zsh)"
-
-# Generated for envman. Do not edit.
-[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
-export GOTOOLCHAIN=local
 
 # vscode shell integration
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 
 # mise
-eval "$(~/.local/bin/mise activate zsh)"
+eval "$(mise activate zsh)"
 
 # fgctl
 export PATH=$PATH:$HOME/.fgctl/bin
