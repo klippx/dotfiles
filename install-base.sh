@@ -23,6 +23,8 @@ stow --target $HOME psql
 mkdir -p $HOME/.config
 stow --target $HOME/.config starship
 stow --target $HOME/.config ghostty
+mkdir -p $HOME/.copilot
+stow --target $HOME/.copilot copilot
 
 echo "Finished successfully."
 

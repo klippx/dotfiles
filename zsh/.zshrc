@@ -118,7 +118,7 @@ alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias code='/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code'
 
 # Copilot with allowed shell tools:
-alias copilot='copilot --allow-tool "shell(gh:*), shell(python3), shell(mkdir), shell(git:*), shell(pnpm:*), shell(sed), shell(awk), shell(xargs), shell(grep)"'
+alias copilot='copilot --allow-tool "shell(gh:*), shell(python3), shell(mkdir), shell(git:*), shell(pnpm:*), shell(sed), shell(awk), shell(xargs), shell(grep), shell(curl), shell(find)"'
 
 # Read local secrets
 [ -f ~/.zsh.local ] && source ~/.zsh.local
