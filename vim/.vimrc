@@ -41,14 +41,10 @@ set smartcase
 set incsearch
 set hlsearch
 nnoremap <CR> :noh<CR><CR>:<backspace>
-so ~/.vim/plugins.vim
-so ~/.vim/plugin-config.vim
-so ~/.vim/autoclose.vim
 
 "-- COLOR & THEME CONFIG
 set termguicolors
 let g:gruvbox_italic=1
-colorscheme gruvbox
 set background=dark
 hi Normal guibg=NONE ctermbg=NONE
 let g:terminal_ansi_colors = [
