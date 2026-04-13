@@ -9,7 +9,7 @@ window-padding-x = 10
 window-padding-y = 5
 
 # Scrollback
-scrollback-limit = 10000
+scrollback-limit = 50000
 
 # Theme
 # theme = dark:Gruvbox Material Dark,light:Gruvbox Material Light
