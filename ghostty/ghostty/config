@@ -1,24 +1,36 @@
 # Shell
+
 shell-integration = zsh
 
 # Font
+
 font-size = 14
 
 # Window
+
 window-padding-x = 10
 window-padding-y = 5
 
 # Scrollback
+
 scrollback-limit = 50000
 
+# Automatically copy selected text
+
+copy-on-select = clipboard
+
 # Theme
+
 # theme = dark:Gruvbox Material Dark,light:Gruvbox Material Light
+
 theme = Gruvbox Material Dark
 
 # https://ghostty.org/docs/config/reference#macos-option-as-alt
+
 macos-option-as-alt = true
 
 # https://github.com/thrawny/dotfiles/blob/main/nix/home/shared/ghostty.nix
+
 gtk-titlebar = false
 confirm-close-surface = false
 cursor-style-blink = false
