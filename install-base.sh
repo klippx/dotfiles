@@ -23,8 +23,11 @@ stow --target $HOME psql
 mkdir -p $HOME/.config
 stow --target $HOME/.config starship
 stow --target $HOME/.config ghostty
+
+# To update skills:
+# npx skills@latest add mattpocock/skills
 mkdir -p $HOME/.copilot
-stow --target $HOME/.copilot copilot
+stow --target $HOME/.copilot .agents
 
 echo "Finished successfully."
 
