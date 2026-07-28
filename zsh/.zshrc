@@ -46,6 +46,7 @@ eval "$(direnv hook $SHELL)"
 #
 # NOTE: fpath additions (e.g. Docker completions) must come before compinit.
 fpath=($HOME/.docker/completions $fpath)
+fpath=($HOME/.fgctl/completions $fpath)
 # Only re-run compaudit once a day; use cached dump otherwise.
 autoload -Uz compinit
 if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
@@ -187,3 +188,11 @@ eval "$(mise activate zsh)"
 
 # fgctl
 export PATH=$PATH:$HOME/.fgctl/bin
+
+# pnpm
+export PNPM_HOME="/Users/MKLIPPIN/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

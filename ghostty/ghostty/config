@@ -13,7 +13,7 @@ window-padding-y = 5
 
 # Scrollback
 
-scrollback-limit = 50000
+scrollback-limit = 500000
 
 # Automatically copy selected text
 
@@ -21,9 +21,8 @@ copy-on-select = clipboard
 
 # Theme
 
-# theme = dark:Gruvbox Material Dark,light:Gruvbox Material Light
-
-theme = Gruvbox Material Dark
+#theme = dark:Gruvbox Material Dark,light:Gruvbox Material Light
+ theme = Gruvbox Material Dark
 
 # https://ghostty.org/docs/config/reference#macos-option-as-alt
 
