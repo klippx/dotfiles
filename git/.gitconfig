@@ -29,7 +29,6 @@
   whitespace = trailing-space,space-before-tab
   pager = diff-so-fancy | less --tabs=4 -RFX
   preloadIndex = false
-  splitIndex = true
   autocrlf = input
 [pager]
   diff=true
