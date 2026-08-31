@@ -14,7 +14,9 @@
   gr = log --show-signature --graph --full-history --all --color --decorate
   unstage = reset HEAD --
   # cleanup = !git branch --list --merged | grep -v main | xargs git branch -d
-  cleanup = !git branch -vv | egrep ': gone]' | awk '{print $1}' | xargs git branch -D
+  # cleanup = !git branch -vv | egrep ': gone]' | awk '{print $1}' | xargs git branch -D
+  cleanup = !git for-each-ref --format='%(refname:short)%09%(upstream:track)%09%(worktreepath)' refs/heads | awk -F '\\t' '$2 == \"[gone]\" && $3 == \"\" {print $1}' | xargs -r git branch -D
+  worktree-cleanup = "!f() { git for-each-ref --format='%(upstream:track)%09%(worktreepath)' refs/heads | awk -F '\\t' '$1 == \"[gone]\" && $2 != \"\" {print $2}' | while IFS= read -r path; do git worktree remove \"$path\" || exit; done && git worktree prune && git cleanup; }; f"
   publish = !git push -u origin $(git branch-name)
   branch-name = !git rev-parse --abbrev-ref HEAD
   pushf = push --force-with-lease
