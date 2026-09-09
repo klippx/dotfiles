@@ -18,9 +18,6 @@ fi
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-# ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
-
 ### Aliases (early — before keybinds)
 #
 alias wt="curl http://wttr.in/"
@@ -67,10 +64,6 @@ eval "$(zoxide init zsh)"
 # NOTE:
 # git clone https://github.com/chrisands/zsh-yarn-completions.git ~/.zsh-yarn-completions
 # source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
-
-### Fix for catalina: https://stackoverflow.com/questions/58272830/python-crashing-on-macos-10-15-beta-19a582a-with-usr-lib-libcrypto-dylib
-# export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
-# export DYLD_LIBRARY_PATH=/usr/local/opt/openssl/lib:$DYLD_LIBRARY_PATH
 
 ### Aliases
 #
