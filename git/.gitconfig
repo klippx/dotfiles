@@ -21,6 +21,8 @@
   branch-name = !git rev-parse --abbrev-ref HEAD
   pushf = push --force-with-lease
   alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
+  repair-index = !git -c core.fsmonitor=false reset --mixed HEAD && git -c core.fsmonitor=false status
+	rebuild-index = !index=$(git rev-parse --git-path index) && mv \"$index\" \"$index.bad.$(date +%Y%m%d%H%M%S)\" && git -c core.fsmonitor=false read-tree HEAD && git -c core.fsmonitor=false status
 [merge]
   tool = vimdiff
   stat = true
