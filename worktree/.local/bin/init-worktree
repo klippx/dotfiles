@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Run by a user-level Copilot sessionStart hook; reads its JSON cwd from stdin.
+# Copy missing root-level .env, .envrc, and .secrets (file or directory), retaining
+# permissions and symlinks. Existing entries, even dangling symlinks, stay intact.
+# Missing sources are normal; copy failures report errors and may leave partial
+# copies. No contents are printed, and no trust commands or copied files run.
+# Ensure these names are ignored in your projects; no ignore rules are added.
+# Primary checkouts, non-Git folders, and bare primaries are skipped. Separate
+# gitdirs cannot reliably identify their primary checkout and report an error.
+set -eu
+
+if ! cwd=$(jq -er '.cwd | select(type == "string" and length > 0)'); then
+  printf 'init-worktree: expected a JSON hook payload with a nonempty cwd string\n' >&2
+  exit 1
+fi
+git_dir=$(LC_ALL=C git -C "$cwd" rev-parse --absolute-git-dir 2>&1) || {
+  result=$?
+  [[ "$git_dir" == 'fatal: not a git repository'* ]] && exit 0
+  printf 'init-worktree: cannot inspect Git checkout (exit %s)\n' "$result" >&2
+  exit "$result"
+}
+common_dir=$(git -C "$cwd" rev-parse --path-format=absolute --git-common-dir)
+[[ "$git_dir" != "$common_dir" ]] || exit 0
+destination=$(git -C "$cwd" rev-parse --show-toplevel)
+{
+  IFS= read -r -d '' record
+  IFS= read -r -d '' state
+  # Drain the remaining records to avoid SIGPIPE with many worktrees.
+  cat > /dev/null
+} < <(git -C "$cwd" worktree list --porcelain -z)
+primary=${record#worktree }
+[[ "$state" != bare ]] || exit 0
+if [[ "$primary" == "$common_dir" ]]; then
+  printf 'init-worktree: separate gitdirs are unsupported\n' >&2
+  exit 1
+fi
+
+status=0
+for name in .env .envrc .secrets; do
+  [[ -e "$primary/$name" || -L "$primary/$name" ]] || continue
+  [[ ! -e "$destination/$name" && ! -L "$destination/$name" ]] || continue
+  if ! cp -R -P -p -n -- "$primary/$name" "$destination/$name"; then
+    printf 'init-worktree: failed to copy %s into %s\n' "$name" "$destination" >&2
+    status=1
+  fi
+done
+exit "$status"
