@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Run by a user-level Copilot sessionStart hook; reads its JSON cwd from stdin.
+# Copy missing .env, .envrc, and .secrets at any depth, retaining
+# permissions and symlinks. Existing entries, even dangling symlinks, stay intact.
+# Discovery skips .git, node_modules, and directory symlinks; matching directories
+# are copied as single units. Symlinked or non-directory destination parents fail.
+# Missing sources are normal; copy failures report errors and may leave partial
+# copies. No contents are printed, and no trust commands or copied files run.
+# Ensure these names are ignored in your projects; no ignore rules are added.
+# Primary checkouts, non-Git folders, and bare primaries are skipped. Separate
+# gitdirs cannot reliably identify their primary checkout and report an error.
+set -euo pipefail
+
+if ! cwd=$(jq -er '.cwd | select(type == "string" and length > 0)'); then
+  printf 'init-worktree: expected a JSON hook payload with a nonempty cwd string\n' >&2
+  exit 1
+fi
+git_dir=$(LC_ALL=C git -C "$cwd" rev-parse --absolute-git-dir 2>&1) || {
+  result=$?
+  [[ "$git_dir" == 'fatal: not a git repository'* ]] && exit 0
+  printf 'init-worktree: cannot inspect Git checkout (exit %s)\n' "$result" >&2
+  exit "$result"
+}
+common_dir=$(git -C "$cwd" rev-parse --path-format=absolute --git-common-dir)
+[[ "$git_dir" != "$common_dir" ]] || exit 0
+destination=$(git -C "$cwd" rev-parse --show-toplevel)
+{
+  IFS= read -r -d '' record
+  IFS= read -r -d '' state
+  # Drain the remaining records to avoid SIGPIPE with many worktrees.
+  cat > /dev/null
+} < <(git -C "$cwd" worktree list --porcelain -z)
+primary=${record#worktree }
+[[ "$state" != bare ]] || exit 0
+if [[ "$primary" == "$common_dir" ]]; then
+  printf 'init-worktree: separate gitdirs are unsupported\n' >&2
+  exit 1
+fi
+
+{
+  find -P "$primary" -mindepth 1 \( -name .git -o -name node_modules \) -prune -o \
+    \( -name .env -o -name .envrc -o -name .secrets \) -print0 -prune || {
+    printf 'init-worktree: failed to scan primary checkout\n' >&2
+    exit 1
+  }
+} | {
+  status=0
+  while IFS= read -r -d '' source; do
+    relative=${source#"$primary"/}
+    target="$destination/$relative"
+    [[ ! -e "$target" && ! -L "$target" ]] || continue
+    parent=$destination
+    remainder=$relative
+    while [[ "$remainder" == */* ]]; do
+      parent="$parent/${remainder%%/*}"
+      if [[ -L "$parent" || ( -e "$parent" && ! -d "$parent" ) ]]; then
+        printf 'init-worktree: unsafe destination parent %s\n' "$parent" >&2
+        status=1
+        break
+      fi
+      if [[ ! -d "$parent" ]] && ! mkdir -- "$parent"; then
+        printf 'init-worktree: failed to create destination parent %s\n' "$parent" >&2
+        status=1
+        break
+      fi
+      remainder=${remainder#*/}
+    done
+    [[ "$remainder" != */* ]] || continue
+    if ! cp -R -P -p -n -- "$source" "$target"; then
+      printf 'init-worktree: failed to copy %s into %s\n' "$relative" "$destination" >&2
+      status=1
+    fi
+  done
+  exit "$status"
+}

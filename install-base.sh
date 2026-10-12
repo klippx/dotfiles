@@ -17,6 +17,8 @@ ln -fs /opt/homebrew/opt/safe-rm/bin/safe-rm /opt/homebrew/bin/rm
 mkdir -p $HOME/.ssh
 stow --target $HOME/.ssh .ssh
 stow --target $HOME git
+mkdir -p "$HOME/.local/bin" "$HOME/.copilot/hooks"
+stow --target "$HOME" worktree
 stow --target $HOME zsh
 stow --target $HOME vim
 stow --target $HOME psql
@@ -30,4 +32,3 @@ mkdir -p $HOME/.copilot
 stow --target $HOME/.copilot .agents
 
 echo "Finished successfully."
-
