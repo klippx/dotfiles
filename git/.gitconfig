@@ -1,5 +1,5 @@
 [push]
-  default = upstream
+	default = simple
   autoSetupRemote = true
 [user]
   name = Mathias Klippinge
