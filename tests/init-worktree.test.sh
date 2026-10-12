@@ -155,6 +155,59 @@ test_missing_sources_and_secrets_file() {
   [[ $(readlink "$root/file linked/.env") == absent-source ]] || fail 'source symlink changed'
 }
 
+test_nested_sources_and_discovery_exclusions() {
+  local primary="$root/nested primary" linked="$root/nested linked"
+  local workspace='dgs/car-configuration' spaced='packages/with spaces'
+  local newline=$'packages/with\nnewline'
+  create_repo "$primary"
+  mkdir -p "$primary/$workspace" "$primary/$spaced/.secrets/nested" "$primary/$newline"
+  printf 'DUMMY_ENV=nested\n' > "$primary/$workspace/.env"
+  printf 'dummy workspace secret\n' > "$primary/$workspace/.secrets"
+  ln -s absent-config "$primary/$workspace/.envrc"
+  printf 'dummy directory secret\n' > "$primary/$spaced/.secrets/nested/token"
+  ln -s nested/token "$primary/$spaced/.secrets/link"
+  printf 'dummy newline environment\n' > "$primary/$newline/.env"
+  printf 'not on allowlist\n' > "$primary/$workspace/.env.local"
+  mkdir -p "$primary/.git/scan fixture" "$primary/node_modules/dependency" \
+    "$primary/$workspace/node_modules/dependency" "$primary/$workspace/.git" \
+    "$root/external source"
+  printf 'excluded metadata\n' > "$primary/.git/scan fixture/.env"
+  printf 'excluded dependency\n' > "$primary/node_modules/dependency/.env"
+  printf 'excluded nested dependency\n' > "$primary/$workspace/node_modules/dependency/.secrets"
+  printf 'excluded nested metadata\n' > "$primary/$workspace/.git/.envrc"
+  printf 'excluded external environment\n' > "$root/external source/.env"
+  ln -s "$root/external source" "$primary/external alias"
+  ln -s dgs "$primary/workspace alias"
+  add_worktree "$primary" "$linked"
+  run_session_hook "$linked" > "$root/output" 2>&1
+  [[ ! -s "$root/output" ]] || fail 'nested initialization printed output'
+  assert_same "$primary/$workspace/.env" "$linked/$workspace/.env"
+  assert_same "$primary/$workspace/.secrets" "$linked/$workspace/.secrets"
+  [[ $(readlink "$linked/$workspace/.envrc") == absent-config ]] || fail 'nested source symlink changed'
+  assert_same "$primary/$spaced/.secrets/nested/token" "$linked/$spaced/.secrets/nested/token"
+  [[ $(readlink "$linked/$spaced/.secrets/link") == nested/token ]] || fail 'nested secret symlink changed'
+  assert_same "$primary/$newline/.env" "$linked/$newline/.env"
+  assert_missing "$linked/$workspace/.env.local"
+  assert_missing "$linked/$workspace/.git"
+  assert_missing "$linked/node_modules"
+  assert_missing "$linked/$workspace/node_modules"
+  assert_missing "$linked/external alias"
+  assert_missing "$linked/workspace alias"
+}
+
+test_primary_directory_name_is_not_a_candidate() {
+  local name primary linked
+  for name in .secrets node_modules; do
+    primary="$root/named primary/$name"
+    linked="$root/named linked/$name"
+    create_repo "$primary"
+    printf 'dummy root environment\n' > "$primary/.env"
+    add_worktree "$primary" "$linked"
+    run_session_hook "$linked"
+    assert_same "$primary/.env" "$linked/.env"
+  done
+}
+
 test_existing_destinations() {
   local primary="$root/destinations primary" target kind name link_to
   create_repo "$primary"
@@ -190,10 +243,87 @@ test_existing_destinations() {
   done
 }
 
+test_existing_nested_destinations() {
+  local primary="$root/nested destinations primary" linked="$root/nested destinations linked"
+  local kind name relative target link_to
+  create_repo "$primary"
+  add_worktree "$primary" "$linked"
+  printf 'keep destination\n' > "$root/nested expected"
+  for kind in file directory symlink dangling; do
+    relative="dgs/$kind workspace"
+    target="$linked/$relative"
+    mkdir -p "$primary/$relative/.secrets/nested" "$target"
+    printf 'dummy source\n' > "$primary/$relative/.env"
+    printf 'dummy source\n' > "$primary/$relative/.envrc"
+    printf 'dummy nested secret\n' > "$primary/$relative/.secrets/nested/.env"
+    cp "$root/nested expected" "$target/keep"
+    link_to=keep
+    [[ "$kind" != dangling ]] || link_to=absent
+    for name in .env .envrc .secrets; do
+      case "$kind" in
+        file) cp "$target/keep" "$target/$name" ;;
+        directory) mkdir "$target/$name"; cp "$target/keep" "$target/$name/keep" ;;
+        *) ln -s "$link_to" "$target/$name" ;;
+      esac
+    done
+  done
+  run_session_hook "$linked"
+  for kind in file directory symlink dangling; do
+    target="$linked/dgs/$kind workspace"
+    link_to=keep
+    [[ "$kind" != dangling ]] || link_to=absent
+    for name in .env .envrc .secrets; do
+      case "$kind" in
+        file) assert_same "$root/nested expected" "$target/$name" ;;
+        directory)
+          assert_same "$root/nested expected" "$target/$name/keep"
+          [[ $(find "$target/$name" -mindepth 1 -maxdepth 1 | wc -l) -eq 1 ]] ||
+            fail 'existing nested directory modified'
+          ;;
+        *) [[ $(readlink "$target/$name") == "$link_to" ]] || fail 'nested destination symlink changed' ;;
+      esac
+    done
+  done
+}
+
+test_unsafe_nested_parents() {
+  local primary="$root/unsafe primary" linked="$root/unsafe linked" kind
+  create_repo "$primary"
+  printf 'dummy root environment\n' > "$primary/.env"
+  for kind in outside dangling file inside; do
+    mkdir -p "$primary/dgs/$kind"
+    printf 'dummy nested environment\n' > "$primary/dgs/$kind/.env"
+  done
+  add_worktree "$primary" "$linked"
+  mkdir -p "$linked/dgs/real directory" "$root/outside destination"
+  printf 'keep existing file\n' > "$linked/dgs/file"
+  cp "$linked/dgs/file" "$root/unsafe expected"
+  ln -s "$root/outside destination" "$linked/dgs/outside"
+  ln -s "$root/absent destination" "$linked/dgs/dangling"
+  ln -s 'real directory' "$linked/dgs/inside"
+  if run_session_hook "$linked" > "$root/output" 2>&1; then
+    fail 'unsafe nested parents accepted'
+  fi
+  for kind in outside dangling file inside; do
+    grep -Fq "unsafe destination parent $linked/dgs/$kind" "$root/output" ||
+      fail "unsafe $kind parent not reported"
+  done
+  assert_same "$root/unsafe expected" "$linked/dgs/file"
+  [[ $(readlink "$linked/dgs/outside") == "$root/outside destination" ]] || fail 'outside symlink changed'
+  [[ $(readlink "$linked/dgs/dangling") == "$root/absent destination" ]] || fail 'dangling parent changed'
+  [[ $(readlink "$linked/dgs/inside") == 'real directory' ]] || fail 'inside symlink changed'
+  assert_missing "$root/outside destination/.env"
+  assert_missing "$root/absent destination"
+  assert_missing "$linked/dgs/real directory/.env"
+  assert_same "$primary/.env" "$linked/.env"
+}
+
 test_copy_failures() {
   local primary="$root/failure"
   create_repo "$primary"
   printf 'DUMMY_DO_NOT_PRINT\n' > "$primary/.env"
+  mkdir -p "$primary/dgs/car-configuration"
+  printf 'DUMMY_DO_NOT_PRINT\n' > "$primary/dgs/car-configuration/.env"
   add_worktree "$primary" "$root/failure linked"
   mkdir "$root/failing-bin"
   printf '#!/bin/sh\nexit 25\n' > "$root/failing-bin/cp"
@@ -202,9 +332,23 @@ test_copy_failures() {
     fail 'copy failure ignored'
   fi
   grep -q 'failed to copy .env' "$root/output" || fail 'copy failure not reported'
+  grep -q 'failed to copy dgs/car-configuration/.env' "$root/output" || fail 'nested copy failure not reported'
   if grep -qE 'DUMMY_DO_NOT_PRINT|DUMMY_PRIVATE_PROMPT' "$root/output"; then
     fail 'private contents printed'
   fi
+  add_worktree "$primary" "$root/parent failure linked"
+  printf '#!/bin/sh\nexit 25\n' > "$root/failing-bin/mkdir"
+  chmod +x "$root/failing-bin/mkdir"
+  if PATH="$root/failing-bin:$PATH" run_session_hook "$root/parent failure linked" > "$root/output" 2>&1; then
+    fail 'parent creation failure ignored'
+  fi
+  grep -q 'failed to create destination parent' "$root/output" || fail 'parent creation failure not reported'
+  printf '#!/bin/sh\nexit 25\n' > "$root/failing-bin/find"
+  chmod +x "$root/failing-bin/find"
+  if PATH="$root/failing-bin:$PATH" run_session_hook "$root/failure linked" > "$root/output" 2>&1; then
+    fail 'source discovery failure ignored'
+  fi
+  grep -q 'failed to scan primary checkout' "$root/output" || fail 'source discovery failure not reported'
 }
 
 test_git_hooks_are_untouched() {
@@ -257,7 +401,11 @@ main() {
     test_invalid_payloads_and_non_git_cwd \
     test_bare_and_separate_gitdirs \
     test_missing_sources_and_secrets_file \
+    test_nested_sources_and_discovery_exclusions \
+    test_primary_directory_name_is_not_a_candidate \
     test_existing_destinations \
+    test_existing_nested_destinations \
+    test_unsafe_nested_parents \
     test_copy_failures \
     test_git_hooks_are_untouched \
     test_stow_removal; do
