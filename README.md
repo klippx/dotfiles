@@ -24,7 +24,9 @@ stow --target "$HOME" worktree
 
 Copying happens on agent startup, including nested workspaces in existing linked
 worktrees; behavior, safety, and unsupported layouts are documented in the script.
-Tests: `bash tests/init-worktree.test.sh` uses temporary Git repositories and dummy files.
+With direnv installed, newly copied `.envrc` files inherit approval only from an
+already trusted, byte-identical source; existing files are not approved.
+Tests: `bash tests/init-worktree.test.sh` requires direnv and uses temporary Git repositories and dummy files.
 Remove with `stow --target "$HOME" --delete worktree`; other user hooks and
 previously copied files remain.
 

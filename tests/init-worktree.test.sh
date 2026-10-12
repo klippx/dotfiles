@@ -9,11 +9,13 @@ setup() {
   root=$(cd -- "$root" && pwd -P)
   trap 'rm -rf -- "$root"' EXIT
   export HOME="$root/home" XDG_CONFIG_HOME="$root/home/.config"
+  export XDG_DATA_HOME="$root/home/.local/share" DIRENV_CONFIG="$root/home/.config/direnv"
   export GIT_CONFIG_GLOBAL="$root/gitconfig" GIT_CONFIG_NOSYSTEM=1
   export GIT_CEILING_DIRECTORIES="$root"
   unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE GIT_OBJECT_DIRECTORY
   unset GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS GIT_CONFIG GIT_TEMPLATE_DIR
   unset COPILOT_ROOT_PATH COPILOT_WORKSPACE_PATH
+  unset DIRENV_DIR DIRENV_FILE DIRENV_DIFF DIRENV_WATCHES
   mkdir -p "$HOME/.local/bin" "$HOME/.copilot/hooks" "$root/template"
   printf '{"version":1,"hooks":{}}\n' > "$HOME/.copilot/hooks/personal.json"
   cp "$HOME/.copilot/hooks/personal.json" "$root/expected-personal.json"
@@ -55,6 +57,13 @@ add_worktree() {
 run_session_hook() {
   jq -nc --arg cwd "$1" '{cwd: $cwd, initialPrompt: "DUMMY_PRIVATE_PROMPT"}' |
     bash -c '"$HOME/.local/bin/init-worktree"'
+}
+
+assert_direnv_state() {
+  (cd -- "${1%/*}" && direnv status --json) |
+    jq -e --arg path "$1" --argjson allowed "$2" \
+      '.state.foundRC.path == $path and .state.foundRC.allowed == $allowed' > /dev/null ||
+    fail "unexpected direnv approval for $1"
 }
 
 test_worktree_creation_and_checkouts() {
@@ -351,6 +360,115 @@ test_copy_failures() {
   grep -q 'failed to scan primary checkout' "$root/output" || fail 'source discovery failure not reported'
 }
 
+test_direnv_approval_inherits_source_trust() {
+  local primary="$root/direnv primary" linked="$root/direnv linked" kind
+  create_repo "$primary"
+  printf 'touch "%s"\nprintf "DUMMY_PRIVATE_ENVRC\\n"\n' "$root/direnv-executed" > "$primary/.envrc"
+  direnv allow "$primary/.envrc" > /dev/null
+  for kind in 'trusted nested' 'trusted symlink' untrusted denied changed existing 'existing symlink'; do
+    mkdir -p "$primary/dgs/$kind"
+    if [[ "$kind" == 'trusted symlink' ]]; then
+      ln -s "$primary/.envrc" "$primary/dgs/$kind/.envrc"
+    else
+      cp "$primary/.envrc" "$primary/dgs/$kind/.envrc"
+    fi
+    if [[ "$kind" != untrusted ]]; then
+      direnv allow "$primary/dgs/$kind" > /dev/null
+    fi
+  done
+  direnv deny "$primary/dgs/denied/.envrc" > /dev/null
+  printf '# changed since approval\n' >> "$primary/dgs/changed/.envrc"
+  assert_direnv_state "$primary/dgs/changed/.envrc" 1
+  add_worktree "$primary" "$linked"
+  mkdir -p "$linked/dgs/existing" "$linked/dgs/existing symlink"
+  cp "$primary/dgs/existing/.envrc" "$linked/dgs/existing/.envrc"
+  cp "$primary/dgs/existing symlink/.envrc" "$linked/dgs/existing symlink/keep"
+  ln -s keep "$linked/dgs/existing symlink/.envrc"
+  run_session_hook "$linked" > "$root/output" 2>&1
+  [[ ! -s "$root/output" ]] || fail 'direnv approval printed output'
+  assert_direnv_state "$linked/.envrc" 0
+  assert_direnv_state "$linked/dgs/trusted nested/.envrc" 0
+  assert_direnv_state "$linked/dgs/trusted symlink/.envrc" 0
+  for kind in untrusted denied changed existing 'existing symlink'; do
+    assert_direnv_state "$linked/dgs/$kind/.envrc" 1
+    assert_same "$primary/dgs/$kind/.envrc" "$linked/dgs/$kind/.envrc"
+  done
+  [[ $(readlink "$linked/dgs/existing symlink/.envrc") == keep ]] || fail 'existing envrc symlink changed'
+  assert_missing "$root/direnv-executed"
+  direnv deny "$linked/.envrc" > /dev/null
+  run_session_hook "$linked" > "$root/output" 2>&1
+  assert_direnv_state "$linked/.envrc" 2
+  assert_missing "$root/direnv-executed"
+}
+
+test_direnv_missing() {
+  local primary="$root/no direnv primary" linked="$root/no direnv linked" tool
+  create_repo "$primary"
+  printf 'dummy environment config\n' > "$primary/.envrc"
+  add_worktree "$primary" "$linked"
+  mkdir "$root/without-direnv"
+  for tool in bash git jq find cat cp mkdir cmp; do
+    ln -s "$(type -aP "$tool" | tail -n 1)" "$root/without-direnv/$tool"
+  done
+  PATH="$root/without-direnv" run_session_hook "$linked" > "$root/output" 2>&1
+  assert_same "$primary/.envrc" "$linked/.envrc"
+  grep -q 'direnv unavailable; approval skipped' "$root/output" || fail 'missing direnv not reported'
+  assert_direnv_state "$linked/.envrc" 1
+}
+
+test_direnv_failures_and_source_verification() {
+  local primary="$root/direnv failures primary" linked kind trust test_path status_exit
+  create_repo "$primary"
+  printf 'DUMMY_PRIVATE_ENVRC\n' > "$primary/.envrc"
+  mkdir "$root/direnv-bin"
+  printf '%s\n' '#!/bin/sh' 'case "$1" in' \
+    'status) printf "%s\n" "$DUMMY_DIRENV_STATUS"; exit "${DUMMY_STATUS_EXIT:-0}" ;;' \
+    'allow) printf "called\n" >> "$DUMMY_DIRENV_EVENTS"; printf "DUMMY_PRIVATE_ERROR\n" >&2; exit 25 ;;' \
+    'esac' > "$root/direnv-bin/direnv"
+  chmod +x "$root/direnv-bin/direnv"
+  for kind in status malformed schema inherited allow different; do
+    linked="$root/direnv $kind linked"
+    add_worktree "$primary" "$linked"
+    test_path="$root/direnv-bin:$PATH"
+    status_exit=0
+    trust=$(jq -nc --arg path "$primary/.envrc" '{state:{foundRC:{path:$path,allowed:0}}}')
+    case "$kind" in
+      status) status_exit=25 ;;
+      malformed) trust='not JSON' ;;
+      schema) trust='{}' ;;
+      inherited) trust=$(jq -nc --arg path "$root/other/.envrc" '{state:{foundRC:{path:$path,allowed:0}}}') ;;
+      different)
+        mkdir "$root/different-bin"
+        printf '%s\n' '#!/bin/sh' 'for target do :; done' \
+          'printf "dummy different config\n" > "$target"' > "$root/different-bin/cp"
+        chmod +x "$root/different-bin/cp"
+        test_path="$root/different-bin:$test_path"
+        ;;
+    esac
+    if PATH="$test_path" DUMMY_DIRENV_STATUS="$trust" DUMMY_STATUS_EXIT="$status_exit" \
+       DUMMY_DIRENV_EVENTS="$root/direnv-events" run_session_hook "$linked" > "$root/output" 2>&1; then
+      [[ "$kind" == inherited ]] || fail "direnv $kind failure ignored"
+    else
+      [[ "$kind" != inherited ]] || fail 'inherited approval treated as an error'
+    fi
+    case "$kind" in
+      status|malformed|schema) grep -q 'failed to inspect direnv approval' "$root/output" || fail 'trust inspection failure not reported' ;;
+      allow) grep -q 'failed to allow .envrc' "$root/output" || fail 'approval failure not reported' ;;
+      different) grep -q 'cannot verify .envrc' "$root/output" || fail 'different copied content accepted' ;;
+      inherited) [[ ! -s "$root/output" ]] || fail 'inherited approval printed output' ;;
+    esac
+    if [[ "$kind" != allow ]]; then
+      assert_missing "$root/direnv-events"
+    else
+      grep -q called "$root/direnv-events" || fail 'approval was not attempted'
+      rm "$root/direnv-events"
+    fi
+    if grep -qE 'DUMMY_PRIVATE_ENVRC|DUMMY_PRIVATE_PROMPT|DUMMY_PRIVATE_ERROR' "$root/output"; then
+      fail 'direnv printed private contents'
+    fi
+  done
+}
+
 test_git_hooks_are_untouched() {
   local kind primary linked hooks events hook
   for kind in default custom; do
@@ -407,6 +525,9 @@ main() {
     test_existing_nested_destinations \
     test_unsafe_nested_parents \
     test_copy_failures \
+    test_direnv_approval_inherits_source_trust \
+    test_direnv_missing \
+    test_direnv_failures_and_source_verification \
     test_git_hooks_are_untouched \
     test_stow_removal; do
     "$test_case"
