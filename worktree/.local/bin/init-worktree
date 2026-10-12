@@ -5,11 +5,45 @@
 # Discovery skips .git, node_modules, and directory symlinks; matching directories
 # are copied as single units. Symlinked or non-directory destination parents fail.
 # Missing sources are normal; copy failures report errors and may leave partial
-# copies. No contents are printed, and no trust commands or copied files run.
+# copies. Newly copied .envrc files inherit direnv approval only from an already
+# trusted, byte-identical source. Existing entries are never approved; missing
+# direnv skips approval with a warning. No contents are printed, no dependencies
+# are installed, and this hook never evaluates copied files.
 # Ensure these names are ignored in your projects; no ignore rules are added.
 # Primary checkouts, non-Git folders, and bare primaries are skipped. Separate
 # gitdirs cannot reliably identify their primary checkout and report an error.
 set -euo pipefail
+
+allow_copied_envrc() {
+  local source="$1" target="$2" trusted
+  [[ -f "$source" && -f "$target" ]] || return 0
+  if ! command -v direnv > /dev/null; then
+    printf 'init-worktree: direnv unavailable; approval skipped for %s\n' "$target" >&2
+    return 0
+  fi
+  if ! trusted=$(
+    (cd -- "${source%/*}" && direnv status --json) 2>/dev/null |
+      jq -r --arg source "$source" '
+        .state.foundRC as $rc |
+        if ($rc | type) != "object" or ($rc.path | type) != "string" or
+           ($rc.allowed != 0 and $rc.allowed != 1 and $rc.allowed != 2)
+        then error("invalid direnv status")
+        else $rc.path == $source and $rc.allowed == 0
+        end' 2>/dev/null
+  ); then
+    printf 'init-worktree: failed to inspect direnv approval for %s\n' "$source" >&2
+    return 1
+  fi
+  [[ "$trusted" == true ]] || return 0
+  if ! cmp -s -- "$source" "$target"; then
+    printf 'init-worktree: cannot verify .envrc matches its trusted source: %s\n' "$target" >&2
+    return 1
+  fi
+  if ! direnv allow "${target%/*}" > /dev/null 2>&1; then
+    printf 'init-worktree: failed to allow .envrc: %s\n' "$target" >&2
+    return 1
+  fi
+}
 
 if ! cwd=$(jq -er '.cwd | select(type == "string" and length > 0)'); then
   printf 'init-worktree: expected a JSON hook payload with a nonempty cwd string\n' >&2
@@ -68,6 +102,10 @@ fi
     [[ "$remainder" != */* ]] || continue
     if ! cp -R -P -p -n -- "$source" "$target"; then
       printf 'init-worktree: failed to copy %s into %s\n' "$relative" "$destination" >&2
+      status=1
+      continue
+    fi
+    if [[ "${relative##*/}" == .envrc ]] && ! allow_copied_envrc "$source" "$target"; then
       status=1
     fi
   done
